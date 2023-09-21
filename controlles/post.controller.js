@@ -1,4 +1,5 @@
 import { pool } from "../database/config.js"
+import { userExists } from "../database/orm.js"
 
 export const postStore = async (req, res) => {
     try {
@@ -34,10 +35,42 @@ export const postStore = async (req, res) => {
             user_id,
             image
         })
-        
+
     } catch (error) {
 
         console.log(error)
         
     }
+}
+
+export const getAllPosts = async (req, res) => {
+
+    try {
+        
+        const { user_id } = req.params;
+
+        const user = await userExists(res, user_id)
+
+        if (!user) {
+
+            return res.status(400).json({
+                msg: 'User not found',
+                success: false
+            })
+        }
+    
+        const query = `SELECT * FROM posts WHERE user_id in (SELECT friend_id FROM friends WHERE user_id = ${user_id});`
+    
+        const [resp] = await pool.query(query)
+    
+        return res.status(200).json({
+            posts: resp
+        })
+
+    } catch (error) {
+
+        console.log(error)
+        
+    }
+
 }

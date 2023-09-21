@@ -41,3 +41,12 @@ create table likes(
     foreign key(post_id) references posts(id)
 ) engine=InnoDB
 
+create table friends(
+    id int not null auto_increment,
+    user_id int not null,
+    friend_id int not null,
+    createAt timestamp default current_timestamp,
+    primary key(id),
+    index(user_id),
+    foreign key(user_id) references users(id)
+) engine=InnoDB
