@@ -13,13 +13,15 @@ export const login = async(req, res) => {
 
     if(!user[0]){
         return res.status(400).json({
-            msg: 'Invalid data'
+            msg: 'Invalid data',
+            success: false
         })
     }
 
     if(!bcrypt.compareSync(password, user[0].password)){
         return res.status(400).json({
-            msg: 'Invalid data'
+            msg: 'Invalid data',
+            success: false
         })
     }
 
@@ -28,6 +30,7 @@ export const login = async(req, res) => {
     delete user[0].password
 
     res.status(200).json({
+        success: true,
         token,
         ...user[0]
     })
@@ -44,13 +47,15 @@ export const signup = async(req, res) => {
     
         if(resp.affectedRows === 0) {
             return res.status(400).json({
-                msg: 'Invalid data'
+                msg: 'Invalid data',
+                success: false
             })
         }
     
         const token = await generateJWT({id: resp.insertId, name, email})
         
         res.status(200).json({
+            success: true,
             token,
             email,
             password,

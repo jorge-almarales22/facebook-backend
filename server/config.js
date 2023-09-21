@@ -2,6 +2,9 @@ import express from 'express';
 import "dotenv/config";
 import cors from 'cors';
 import { authRouter } from '../routes/auth-routes.js';
+import { createServer } from 'node:http';
+import { Server as ServerIO } from 'socket.io';
+import { socketController } from '../sockets/controller.socket.js';
 export default class Server {
 
     constructor() {
@@ -12,6 +15,17 @@ export default class Server {
             auth: '/api/auth',
         }
         this.routes();
+        this.server = createServer(this.app);
+        this.io =  new ServerIO(this.server, {
+            cors: {
+                origin: "*", // Permite todos los orígenes
+                methods: ["GET", "POST"] // Métodos permitidos
+            }
+        });
+    }
+
+    socket() {
+        this.io.on('connection', socketController)
     }
 
     routes() {
@@ -24,7 +38,7 @@ export default class Server {
         this.app.use(cors());
     }
     listen() {
-        this.app.listen(this.port, () => {
+        this.server.listen(this.port, () => {
             console.log(`Server listening on port ${this.port}`);
         });
     }
