@@ -5,6 +5,7 @@ import { authRouter } from '../routes/auth-routes.js';
 import { createServer } from 'node:http';
 import { Server as ServerIO } from 'socket.io';
 import { socketController } from '../sockets/controller.socket.js';
+import { postsRouter } from '../routes/posts-routes.js';
 export default class Server {
 
     constructor() {
@@ -13,6 +14,7 @@ export default class Server {
         this.middlewares();
         this.paths = {
             auth: '/api/auth',
+            posts: '/api/posts'
         }
         this.routes();
         this.server = createServer(this.app);
@@ -30,6 +32,7 @@ export default class Server {
 
     routes() {
         this.app.use(this.paths.auth, authRouter)
+        this.app.use(this.paths.posts, postsRouter)
     }
 
     middlewares() {
