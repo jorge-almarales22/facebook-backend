@@ -50,3 +50,8 @@ create table friends(
     index(user_id),
     foreign key(user_id) references users(id)
 ) engine=InnoDB
+
+
+alter table users add column token varchar(255)
+
+update users set key_socket = '' where id = 1
