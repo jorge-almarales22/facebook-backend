@@ -59,7 +59,7 @@ export const getAllPosts = async (req, res) => {
             })
         }
     
-        const query = `SELECT * FROM posts WHERE user_id in (SELECT friend_id FROM friends WHERE user_id = ${user_id});`
+        const query = `SELECT p.id as post_id, u.id as user_id, p.content as content, p.image as image, p.createAt as createAt, u.name as name FROM posts p INNER JOIN users u ON p.user_id = u.id WHERE p.user_id in (SELECT friend_id FROM friends WHERE user_id = ${user_id}) OR p.user_id = ${user_id} ORDER BY createAt DESC;`
     
         const [resp] = await pool.query(query)
     
