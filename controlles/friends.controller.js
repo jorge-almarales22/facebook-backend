@@ -1,4 +1,5 @@
 import { pool } from "../database/config.js";
+import { userExists } from "../database/orm.js";
 
 export const searchFriends = async(req, res) => {
     const {username, user_id} = req.query;
@@ -20,4 +21,24 @@ export const searchFriends = async(req, res) => {
     })
 }
 
+export const getFriendRequests = async(req, res) => {
+    const {user_id} = req.query;
 
+    const user = await userExists(res, user_id)
+
+    if (!user) {
+        return res.status(400).json({
+            msg: 'User not found',
+            success: false
+        })
+    }
+
+    const query = `SELECT * FROM users WHERE id IN (SELECT user_id FROM requests WHERE friend_id = ${user_id});`
+
+    const [resp] = await pool.query(query)
+
+    res.status(200).json({
+        success: true,
+        users: resp
+    })
+}

@@ -16,6 +16,11 @@ export const socketController = (socket) => {
         sendRequest(data, socket);
     })
     
+    socket.on('accept-request', async(data, cv)=>{
+        const opt = await acceptedRequest(data, socket);
+        cv(opt);
+    })
+    
 
 }
 
@@ -52,6 +57,39 @@ const sendRequest = async(data, socket) => {
     await pool.query(notification);
 
     socket.broadcast.to(friend.key_socket).emit('notify-request', user);
+
+
+}
+
+const acceptedRequest = async(data, socket) => {
+    try {
+        
+        const {user_id, friend_id} = data;
+
+        //usuario que envio la solicitud
+        const newFriend = await userExists(null, friend_id);
+        
+        //usuario que acepta la solicitud osea el auth
+        const newFriendAccepted = await userExists(null, user_id);
+    
+        const queryAuth = `INSERT INTO friends (user_id, friend_id) VALUES (${user_id}, ${friend_id})`
+        const queryFriend = `INSERT INTO friends (user_id, friend_id) VALUES (${friend_id}, ${user_id})`
+
+        const destroyRequestDB = `delete from requests where user_id = ${friend_id} AND friend_id = ${user_id}`
+    
+        await pool.query(queryAuth);
+        await pool.query(queryFriend);
+        await pool.query(destroyRequestDB);
+
+        socket.broadcast.to(newFriend.key_socket).emit('accepted-friend-request', newFriendAccepted);
+
+        return true
+
+    } catch (error) {
+        
+        console.log(error);
+    }
+
 
 
 }
