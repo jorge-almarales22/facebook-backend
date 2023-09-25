@@ -55,3 +55,26 @@ create table friends(
 alter table users add column token varchar(255)
 
 update users set key_socket = '' where id = 1
+
+
+create table requests(
+    id int not null auto_increment,
+    user_id int not null,
+    friend_id int not null,
+    createAt timestamp default current_timestamp,
+    primary key(id),
+    index(user_id),
+    foreign key(user_id) references users(id)
+) engine=InnoDB
+
+
+create table notifications(
+    id int not null auto_increment,
+    user_id int not null,
+    message varchar(255) not null,
+    readed boolean default false,
+    createAt timestamp default current_timestamp,
+    primary key(id),
+    index(user_id),
+    foreign key(user_id) references users(id)
+) engine=InnoDB
