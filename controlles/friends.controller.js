@@ -42,3 +42,26 @@ export const getFriendRequests = async(req, res) => {
         users: resp
     })
 }
+
+export const getAllFriends = async(req, res) => {
+    
+    const {user_id} = req.query;
+
+    const user = await userExists(res, user_id)
+
+    if (!user) {
+        return res.status(400).json({
+            msg: 'User not found',
+            success: false
+        })
+    }
+
+    const query = `SELECT * FROM users WHERE id IN (SELECT friend_id FROM friends WHERE user_id = ${user_id})`
+
+    const [resp] = await pool.query(query)
+
+    res.status(200).json({
+        success: true,
+        users: resp
+    })
+}
