@@ -76,10 +76,13 @@ const acceptedRequest = async(data, socket) => {
         const queryFriend = `INSERT INTO friends (user_id, friend_id) VALUES (${friend_id}, ${user_id})`
 
         const destroyRequestDB = `delete from requests where user_id = ${friend_id} AND friend_id = ${user_id}`
+
+        const queryNotification = `INSERT INTO notifications (user_id, message, readed) VALUES (${friend_id}, '${newFriendAccepted.name} accepted your friend request', ${false})`
     
         await pool.query(queryAuth);
         await pool.query(queryFriend);
         await pool.query(destroyRequestDB);
+        await pool.query(queryNotification);
 
         socket.broadcast.to(newFriend.key_socket).emit('accepted-friend-request', newFriendAccepted);
 
